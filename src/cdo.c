@@ -87,7 +87,7 @@ int matchesQuery (State *state, Todo *todo) {
     return 0;
 }
 
-void filterTodos (State *state) {
+void filterTodosWithReset (State *state, int resetFocused) {
   char *query = state->query;
   if (query == NULL || strlen(query) <= 0) {
     state->numFilteredTodos = state->numTodos;
@@ -115,7 +115,12 @@ void filterTodos (State *state) {
       }
     }
   }
-  state->focusedIdx = 0;
+  if (resetFocused == 1)
+    state->focusedIdx = 0;
+}
+
+void filterTodos (State *state) {
+  filterTodosWithReset(state, 1);
 }
 
 void addQueryChar (State *state, char c) {
@@ -211,6 +216,35 @@ void focusUp (State *state) {
     state->focusedIdx++;
 }
 
+void deleteTodo (State *state) {
+
+  if (state->numFilteredTodos <= 0) return;
+
+  int focusedIdx = state->focusedIdx;
+  int todoIdx = state->filteredTodos[focusedIdx];
+
+  Todo *todo = state->todos[todoIdx];
+  free(todo);
+
+  for (int i = focusedIdx; i < state->numFilteredTodos - 1; i ++)
+    state->filteredTodos[i] = state->filteredTodos[i + 1];
+
+  for (int i = todoIdx; i < state->numTodos - 1; i ++)
+    state->todos[i] = state->todos[i + 1];
+
+  state->numFilteredTodos --;
+  state->numTodos --;
+
+  state->filteredTodos = realloc(state->filteredTodos, sizeof(int) * state->numFilteredTodos);
+  state->todos = realloc(state->todos, sizeof(void*) * state->numTodos);
+
+  if (focusedIdx >= state->numFilteredTodos)
+    state->focusedIdx = state->numFilteredTodos - 1;
+
+  filterTodosWithReset(state, 0);
+
+}
+
 void selectTodo (State *state) {
   if (state->numFilteredTodos <= 0) return;
   int todoIdx = state->filteredTodos[state->focusedIdx];
@@ -228,6 +262,9 @@ void modify_normal (State *state, char c) {
       break;
     case 'n':
       state->mode = NEW;
+      break;
+    case 'd':
+      deleteTodo(state);
       break;
     case 'j':
       focusUp(state);
