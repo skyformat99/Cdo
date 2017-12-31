@@ -115,8 +115,7 @@ void filterTodos (State *state) {
       }
     }
   }
-  if (state->focusedIdx > state->numFilteredTodos - 1)
-    state->focusedIdx = state->numFilteredTodos - 1;
+  state->focusedIdx = 0;
 }
 
 void addQueryChar (State *state, char c) {
