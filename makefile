@@ -1,8 +1,12 @@
 cdo: src/cdo.c
-	gcc -I ./src/ -o dist/cdo src/cdo.c -lncurses
+	gcc --std=c99 -I ./src/ -o dist/cdo src/cdo.c -lncurses
+
+run:
+	./dist/cdo
 
 clean:
 	rm -rf ./dist/*
 
 dev:
-	make cdo && ./dist/cdo
+	make cdo && make run
+
