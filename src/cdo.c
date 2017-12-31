@@ -336,7 +336,7 @@ void render (State *state) {
   move(1, cursorx);
 }
 
-int loop (State *state) {
+void loop (State *state) {
   render(state);
   modify(state, getch());
   loop(state);
