@@ -67,6 +67,8 @@ void destroyState (State *state) {
   if (state->numTodos > 0)
     for (int i = 0; i < state->numTodos; i ++)
       destroyTodo(state->todos[i]);
+  if (state->filteredTodos != NULL)
+    free(state->filteredTodos);
   free(state->todos);
   free(state);
 }
@@ -113,6 +115,8 @@ void filterTodos (State *state) {
       }
     }
   }
+  if (state->focusedIdx > state->numFilteredTodos - 1)
+    state->focusedIdx = state->numFilteredTodos - 1;
 }
 
 void addQueryChar (State *state, char c) {
@@ -209,6 +213,7 @@ void focusUp (State *state) {
 }
 
 void selectTodo (State *state) {
+  if (state->numFilteredTodos <= 0) return;
   int todoIdx = state->filteredTodos[state->focusedIdx];
   Todo *todo = state->todos[todoIdx];
   if (todo->completed == 0)
